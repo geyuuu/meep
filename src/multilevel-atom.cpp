@@ -25,7 +25,7 @@
 
 namespace meep {
 
-multilevel_susceptibility::multilevel_susceptibility(int theL, int theT, const realnum *theGamma,
+multilevel_susceptibility::multilevel_susceptibility(int theL, int theT, const realnum *theGamma, const realnum *theGamma0,
                                                      const realnum *theN0, const realnum *thealpha,
                                                      const realnum *theomega,
                                                      const realnum *thegamma,
@@ -34,6 +34,8 @@ multilevel_susceptibility::multilevel_susceptibility(int theL, int theT, const r
   T = theT;
   Gamma = new realnum[L * L];
   memcpy(Gamma, theGamma, sizeof(realnum) * L * L);
+  Gamma0 = new realnum[L * L];
+  memcpy(Gamma0, theGamma0, sizeof(realnum) * L * L);
   N0 = new realnum[L];
   memcpy(N0, theN0, sizeof(realnum) * L);
   alpha = new realnum[L * T];
@@ -52,6 +54,8 @@ multilevel_susceptibility::multilevel_susceptibility(const multilevel_susceptibi
   T = from.T;
   Gamma = new realnum[L * L];
   memcpy(Gamma, from.Gamma, sizeof(realnum) * L * L);
+  Gamma0 = new realnum[L * L];
+  memcpy(Gamma0, from.Gamma0, sizeof(realnum) * L * L);
   N0 = new realnum[L];
   memcpy(N0, from.N0, sizeof(realnum) * L);
   alpha = new realnum[L * T];
@@ -66,6 +70,7 @@ multilevel_susceptibility::multilevel_susceptibility(const multilevel_susceptibi
 
 multilevel_susceptibility::~multilevel_susceptibility() {
   delete[] Gamma;
+  delete[] Gamma0;
   delete[] N0;
   delete[] alpha;
   delete[] omega;
@@ -266,6 +271,8 @@ void multilevel_susceptibility::update_P(realnum *W[NUM_FIELD_COMPONENTS][2],
       Ntmp[l1] = 0;
       for (int l2 = 0; l2 < L; ++l2) {
         Ntmp[l1] += ((l1 == l2) - Gamma[l1 * L + l2] * dt2) * N[l2];
+        // The injection is not dependent on the N.
+        Ntmp[l1] += -Gamma0[l1 * L + l2] * dt;
       }
     }
 
