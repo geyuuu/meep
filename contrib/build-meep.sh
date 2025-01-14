@@ -149,7 +149,8 @@ if $installdeps && $ubuntu; then
         ffmpeg                  \
 
     [ "$distrib" = 16.04 ] && sudo -H pip3 install --upgrade pip
-    sudo -H pip3 install --no-cache-dir mpi4py
+    # sudo -H pip3 install --no-cache-dir mpi4py
+    sudo apt install python3-mpi4py
     export HDF5_MPI="ON"
     sudo -H pip3 install --no-binary=h5py h5py
     sudo -H pip3 install matplotlib>3.0.0
