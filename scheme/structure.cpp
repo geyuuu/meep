@@ -1206,13 +1206,17 @@ static meep::susceptibility *make_multilevel_sus(const multilevel_atom *d) {
   // non-radiative transition-rate matrix Gamma
   meep::realnum *Gamma = new meep::realnum[L * L];
   memset(Gamma, 0, sizeof(meep::realnum) * (L * L));
+  meep::realnum *Gamma0 = new meep::realnum[L * L];
+  memset(Gamma0, 0, sizeof(meep::realnum) * (L * L));
   for (int t = 0; t < d->transitions.num_items; ++t) {
     int i = d->transitions.items[t].from_level - minlev;
     int j = d->transitions.items[t].to_level - minlev;
     Gamma[i * L + i] +=
-        +d->transitions.items[t].transition_rate + d->transitions.items[t].pumping_rate;
+        +d->transitions.items[t].transition_rate;
+    Gamma0 [i * L + i] += d->transitions.items[t].pumping_rate;
     Gamma[j * L + i] -=
-        +d->transitions.items[t].transition_rate + d->transitions.items[t].pumping_rate;
+        +d->transitions.items[t].transition_rate;
+    Gamma0[j * L + i] -= d->transitions.items[t].pumping_rate;
   }
 
   // initial populations of each level
@@ -1251,8 +1255,9 @@ static meep::susceptibility *make_multilevel_sus(const multilevel_atom *d) {
     }
 
   meep::multilevel_susceptibility *s =
-      new meep::multilevel_susceptibility(L, T, Gamma, N0, alpha, omega, gamma, sigmat);
+      new meep::multilevel_susceptibility(L, T, Gamma, Gamma0, N0, alpha, omega, gamma, sigmat);
   delete[] Gamma;
+  delete[] Gamma0;
   delete[] N0;
   delete[] alpha;
   delete[] omega;
