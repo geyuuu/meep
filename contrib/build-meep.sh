@@ -80,6 +80,11 @@ centos=false
 
 distrib=$(lsb_release -r -s)
 case "$distrib" in
+    20.04) # ubuntu 20.04 Focal Fossa
+        libpng=libpng-dev
+        libpython=libpython3-dev
+        ubuntu=true
+        ;;
     18.04) # ubuntu 18.04 bionic
         libpng=libpng-dev
         libpython=libpython3-dev
@@ -125,9 +130,9 @@ autogensh ()
 if $installdeps && $ubuntu; then
 
     sudo apt-get update
-    sudo apt install software-properties-common
-    sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt install python3.8
+    # sudo apt install software-properties-common
+    # sudo add-apt-repository ppa:deadsnakes/ppa
+    # sudo apt install python3.8
     sudo apt-get -y install     \
         build-essential         \
         gfortran                \
@@ -154,7 +159,7 @@ if $installdeps && $ubuntu; then
     # sudo -H pip3 install --no-cache-dir mpi4py
     sudo apt install python3-mpi4py
     export HDF5_MPI="ON"
-    sudo -H pip3 install --no-binary=h5py h5py
+    sudo -H pip3 install h5py
     sudo -H pip3 install matplotlib>3.0.0
 
     RPATH_FLAGS="-Wl,-rpath,${DESTDIR}/lib:/usr/lib/x86_64-linux-gnu/hdf5/openmpi"
